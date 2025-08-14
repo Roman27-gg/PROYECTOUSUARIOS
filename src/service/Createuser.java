@@ -36,7 +36,7 @@ public abstract class Createuser{
 
     public static String validatePasword(Scanner input){
         do {
-            System.out.print("Digite la contraseña (minimo 8 caracteres, 1 mayuscula, y 1 numero): ");
+            System.out.print("Digite la contraseña (minimo: 8 caracteres, 1 mayuscula, y 1 numero): ");
             String name = input.nextLine();
             Matcher match1 = Pattern.compile("[A-Z]{1,}\s*").matcher(name);
             Matcher match2 = Pattern.compile("[0-9]{1,}\s*").matcher(name);
@@ -50,10 +50,8 @@ public abstract class Createuser{
     }
 
     public static String createId(){
-        do {
-            Random randomnum = new Random();
-            Integer num = randomnum.nextInt(100000, 1000000);
-            return String.valueOf(num);
-        } while (true);
+        Random randomnum = new Random();
+        Integer num = randomnum.nextInt(100000, 1000000);
+        return String.valueOf(num);
     }
 }

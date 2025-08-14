@@ -50,12 +50,12 @@ public class User {
     }
 
     public void setNewUserName(Scanner input){
-        System.out.print("Digite el nuevo nombre de usuario ");
+        System.out.println("Digite el nuevo nombre de usuario ");
         username=(Createuser.validateUserName(input));
     }
 
     public void setNewPasword(Scanner input){
-        System.out.print("Digite la nueva contraseña ");
+        System.out.println("Digite la nueva contraseña ");
         pasword=(Createuser.validatePasword(input));
     }
 
@@ -72,8 +72,8 @@ public class User {
     @Override
     public String toString() {
         return String.format("""
-        Nombre: %S
-        Nombre de usuario: %S
+        Nombre: %s
+        Nombre de usuario: %s
         Id: %S
         Rol: %S
         """, getName(), getUsername(), getId(),(getType()==Type.ADMIN)?"Administrador":"Estandar");
