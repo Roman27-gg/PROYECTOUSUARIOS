@@ -1,0 +1,23 @@
+@startuml user
+class User {
+    String name
+    String id
+    String username 
+    String pasword
+}
+
+enum Type {
+    STANDARD
+    ADMIN
+}
+
+User --> Type
+
+class Record {
+    String action 
+    Long time
+}
+
+User <-- Record
+
+@enduml
