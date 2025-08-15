@@ -1,5 +1,6 @@
 package model;
 
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 import service.Createuser;
@@ -10,6 +11,7 @@ public class User {
     private String username; 
     private String pasword;
     private Type type;
+    private History stockhistory[];
 
     
     public User(String name, String username, String pasword, String id) {
@@ -23,6 +25,7 @@ public class User {
         this.username = username;
         this.pasword = pasword;
         this.type = type;
+        stockhistory= new History[50]; 
     }
 
     public String getName() {
@@ -67,6 +70,24 @@ public class User {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public void addAcction(String acction, LocalDateTime date){
+        for (int i = 0; i < stockhistory.length; i++) {
+            if (stockhistory[i]==null) {
+                stockhistory[i]= new History(acction, date);
+                return;
+            }
+        }
+    }
+
+    public void showHistory(){
+        for (int i = 0; i < stockhistory.length; i++) {
+            if (stockhistory[i]==null){
+                continue;
+            }
+            stockhistory[i].showHistory();
+        }
     }
 
     @Override

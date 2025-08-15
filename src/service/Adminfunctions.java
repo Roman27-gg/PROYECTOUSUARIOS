@@ -1,5 +1,6 @@
 package service;
 
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 import model.User;
@@ -123,5 +124,25 @@ public class Adminfunctions {
         return null;
     }
 
+    public void addActtionAdmin(String acttion, LocalDateTime date){
+        user.addAcction(acttion, date);
+    }
+
+    public void showActualHistory(){
+        user.showHistory();
+    }
+
+    public void addActionByIndex(String acction, LocalDateTime date, Integer i){
+        users[i].addAcction(acction, date);
+    }
+
+    public Boolean showHistoryByIndex(Scanner input, String message){
+        Integer i= searchBy(input, message);
+        if (i==null) {
+            return false;
+        }
+        users[i].showHistory();
+        return true;
+    }
 
 }

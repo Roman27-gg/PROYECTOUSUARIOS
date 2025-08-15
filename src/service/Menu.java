@@ -113,11 +113,12 @@ public class Menu {
                         2. Modificar nombre
                         3. Modificar nombre de usuario
                         4. Ver informacion
-                        10. Cerrar sesion
+                        5. Mostrar historial de acciones
+                        12. Cerrar sesion
                         0. Salir del programa""");
                 System.out.print("Digite su opcion: ");
                 String validate = input.nextLine();
-                if (validate.matches("[0-4]|10")) {
+                if (validate.matches("[0-5]|12")) {
                     return Integer.parseInt(validate);
                 } else {
                     System.out.println("Opcion no valida ");
@@ -130,16 +131,18 @@ public class Menu {
                         2. Modificar nombre propio
                         3. Modificar nombre de usuario propio
                         4. Ver mi informacion actual
-                        5. Buscar un usuario
-                        6. Modificar la informacion de un usuario especifico
-                        7. Borrar un usuario
-                        8. Añadir un usario
-                        9. Ver la informacion de todos los usuarios
-                        10. Cerrar sesion
+                        5. Ver historial de acciones propio
+                        6. Buscar un usuario
+                        7. Modificar la informacion de un usuario especifico
+                        8. Borrar un usuario
+                        9. Añadir un usario
+                        10. Ver la informacion de todos los usuarios
+                        11. Buscar historial de un usuario en especifico 
+                        12. Cerrar sesion
                         0. Salir del programa""");
                 System.out.print("Digite su opcion: ");
                 String validate = input.nextLine();
-                if (validate.matches("[0-9]|10")) {
+                if (validate.matches("[0-9]|10|11|12")) {
                     return Integer.parseInt(validate);
                 } else {
                     System.out.println("Opcion no valida");
@@ -166,9 +169,9 @@ public class Menu {
         } while (true);
     }
 
-    public void modifyPasword(Scanner input, User user, Integer i, Adminfunctions admin) {
+    public Boolean modifyPasword(Scanner input, User user, Integer i, Adminfunctions admin) {
         if (actualPasword(input, user) == false) {
-            return;
+            return false;
         }
         if (user.getType().equals(Type.STANDARD)) {
             user.setNewPasword(input);
@@ -178,11 +181,12 @@ public class Menu {
             admin.setActualPasword(input);
         }
         System.out.println("Contraseña cambiada con exito");
+        return true;
     }
 
-    public void modifyName(Scanner input, User user, Integer i, Adminfunctions admin) {
+    public Boolean modifyName(Scanner input, User user, Integer i, Adminfunctions admin) {
         if (actualPasword(input, user) == false) {
-            return;
+            return false;
         }
         if (user.getType().equals(Type.STANDARD)) {
             user.setNewName(input);
@@ -192,11 +196,12 @@ public class Menu {
             admin.setActualName(input);
         }
         System.out.println("Nombre cambiado con exito");
+        return true;
     }
 
-    public void modifyUserName(Scanner input, User user, Integer i, Adminfunctions admin) {
+    public Boolean modifyUserName(Scanner input, User user, Integer i, Adminfunctions admin) {
         if (actualPasword(input, user) == false) {
-            return;
+            return false;
         }
         if (user.getType().equals(Type.STANDARD)) {
             user.setNewUserName(input);
@@ -206,6 +211,7 @@ public class Menu {
             admin.setActualUserName(input);
         }
         System.out.println("Nombre de usuario cambiado con exito");
+        return true;
     }
 
     public void information(User user, Integer i, Adminfunctions admin) {
@@ -216,6 +222,23 @@ public class Menu {
             admin.showInformation(i);
         } else if (admin != null) {
             admin.showActualInformation();
+        }
+    }
+
+    public Boolean showHistory(User user, Adminfunctions admin, Scanner input, Boolean byIndex){
+        if (admin==null) {
+            user.showHistory();
+            return true;
+        } else if (byIndex==false) {
+            admin.showActualHistory();
+            return true;
+        } else {
+            System.out.println("Digite como desea buscar el usuario para mostrar su historial ");
+            String message;
+            Integer opcion = menuOpcion(input);
+            message = (opcion == 1) ? "Digite el nombre: "
+                : (opcion == 2) ? "Digite el nombre de usuario: " : "Digite la id: ";
+            return admin.showHistoryByIndex(input, message);
         }
     }
 
@@ -246,23 +269,20 @@ public class Menu {
         message = (opcion == 1) ? "Digite el nombre: "
                 : (opcion == 2) ? "Digite el nombre de usuario: " : "Digite la id: ";
         Integer i = admin.searchBy(input, message);
-        if (i == null) {
-            return null;
-        }
         return i;
     }
 
-    public void modifyInformations(Adminfunctions admin, Scanner input) {
+    public Boolean modifyInformations(Adminfunctions admin, Scanner input) {
         if (admin == null) {
             System.out.println("No eres admin ");
-            return;
+            return false;
         }
         if (actualPasword(input, admin.getUser()) == false) {
-            return;
+            return false;
         }
         Integer i = searchUser(admin, input);
         if (i == null) {
-            return;
+            return false;
         }
         System.out.println("Digite que desea modificar del usuario: ");
         Integer opcion;
@@ -287,26 +307,27 @@ public class Menu {
         } else {
             admin.setNewPaswordByIndex(input, i);
         }
+        return true;
     }
 
-    public void deleteUser(Adminfunctions admin, Scanner input) {
+    public Boolean deleteUser(Adminfunctions admin, Scanner input) {
         if (admin == null) {
             System.out.println("No eres admin ");
-            return;
+            return false;
         }
         if (actualPasword(input, admin.getUser())) {
-            return;
+            return false;
         }
         Integer i = searchUser(admin, input);
         if (i == null) {
-            return;
+            return false;
         }
         do {
             System.out.print("¿Esta seguro que desea borrar los datos del usuario?: ");
             String validate = input.nextLine();
             if (validate.equalsIgnoreCase("no")) {
                 System.out.println("No se han borrado los datos");
-                return;
+                return false;
             } else if (validate.equalsIgnoreCase("si")) {
                 break;
             } else {
@@ -316,6 +337,7 @@ public class Menu {
         removeOneData(i);
         admin.deleteUser(i);
         System.out.println("Datos borrados con exito ");
+        return true;
     }
 
     public void createUser(Adminfunctions admin, Scanner input) {
