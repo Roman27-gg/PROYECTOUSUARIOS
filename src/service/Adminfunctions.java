@@ -21,6 +21,9 @@ public class Adminfunctions {
     public User[] getUsers() {
         return users;
     }
+    public User getUserByIndex(Integer i){
+        return users[i];
+    }
 
     public void showActualInformation() {
         System.out.println(user.toString());

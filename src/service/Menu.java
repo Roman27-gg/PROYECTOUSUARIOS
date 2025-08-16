@@ -1,5 +1,6 @@
 package service;
 
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 import model.Type;
@@ -19,9 +20,18 @@ public class Menu {
         usernames[i] = null;
     }
 
+    public Boolean isRepeat(String id, String username){
+        for (int i = 0; i < ids.length; i++) {
+                if (ids[i].equalsIgnoreCase(id) && usernames[i].equalsIgnoreCase(username)) {
+                    return false;
+                }
+        }
+        return true;
+    }
+
     public void addOneData(String id, String username) {
         for (int i = 0; i < ids.length; i++) {
-            if (ids[i] == null && usernames[i] == null) {
+            if (ids[i] == null && usernames[i] == null && isRepeat(id, username)) {
                 ids[i] = id;
                 usernames[i] = username;
             }
@@ -169,46 +179,46 @@ public class Menu {
         } while (true);
     }
 
-    public Boolean modifyPasword(Scanner input, User user, Integer i, Adminfunctions admin) {
+    public Boolean modifyPasword(Scanner input, User user, Adminfunctions admin) {
         if (actualPasword(input, user) == false) {
             return false;
         }
         if (user.getType().equals(Type.STANDARD)) {
             user.setNewPasword(input);
-        } else if (i != null) {
-            admin.setNewPaswordByIndex(input, i);
+            addAcctionToLog(user, null, "Cambio su contraseña");
         } else if (admin != null) {
             admin.setActualPasword(input);
+            addAcctionToLog(null, admin, "Cambio su contraseña");
         }
         System.out.println("Contraseña cambiada con exito");
         return true;
     }
 
-    public Boolean modifyName(Scanner input, User user, Integer i, Adminfunctions admin) {
+    public Boolean modifyName(Scanner input, User user, Adminfunctions admin) {
         if (actualPasword(input, user) == false) {
             return false;
         }
         if (user.getType().equals(Type.STANDARD)) {
             user.setNewName(input);
-        } else if (i != null) {
-            admin.setNewNamedByIndex(input, i);
+            addAcctionToLog(user, null, "Cambio su nombre");
         } else if (admin != null) {
             admin.setActualName(input);
+            addAcctionToLog(null, admin, "Cambio su nombre");
         }
         System.out.println("Nombre cambiado con exito");
         return true;
     }
 
-    public Boolean modifyUserName(Scanner input, User user, Integer i, Adminfunctions admin) {
+    public Boolean modifyUserName(Scanner input, User user, Adminfunctions admin) {
         if (actualPasword(input, user) == false) {
             return false;
         }
         if (user.getType().equals(Type.STANDARD)) {
             user.setNewUserName(input);
-        } else if (i != null) {
-            admin.setNewUserNameByIndex(input, i);
+            addAcctionToLog(user, null, "Cambio su nombre de usuario");
         } else if (admin != null) {
             admin.setActualUserName(input);
+            addAcctionToLog(null, admin, "Cambio su nombre de usuario");
         }
         System.out.println("Nombre de usuario cambiado con exito");
         return true;
@@ -218,19 +228,24 @@ public class Menu {
         System.out.println();
         if (user.getType().equals(Type.STANDARD)) {
             System.out.println(user.toString());
+            addAcctionToLog(user, null, "Busco su informacion");
         } else if (i != null) {
             admin.showInformation(i);
+            addAcctionToLog(null, admin, "Busco la informacion del usuario "+admin.getUserByIndex(i).getName());
         } else if (admin != null) {
             admin.showActualInformation();
+            addAcctionToLog(null, admin, "Busco su informacion");
         }
     }
 
     public Boolean showHistory(User user, Adminfunctions admin, Scanner input, Boolean byIndex){
         if (admin==null) {
             user.showHistory();
+            addAcctionToLog(user, null, "Mostro su log");
             return true;
         } else if (byIndex==false) {
             admin.showActualHistory();
+            addAcctionToLog(null, admin, "Mostro su log");
             return true;
         } else {
             System.out.println("Digite como desea buscar el usuario para mostrar su historial ");
@@ -238,7 +253,12 @@ public class Menu {
             Integer opcion = menuOpcion(input);
             message = (opcion == 1) ? "Digite el nombre: "
                 : (opcion == 2) ? "Digite el nombre de usuario: " : "Digite la id: ";
-            return admin.showHistoryByIndex(input, message);
+            if (admin.showHistoryByIndex(input, message)==true) {
+                addAcctionToLog(null, admin, "Busco el log de un usuario");
+                return true;
+            }
+            return false;
+            
         }
     }
 
@@ -269,6 +289,9 @@ public class Menu {
         message = (opcion == 1) ? "Digite el nombre: "
                 : (opcion == 2) ? "Digite el nombre de usuario: " : "Digite la id: ";
         Integer i = admin.searchBy(input, message);
+        if (i!=null) {
+            addAcctionToLog(null, admin, "Busco un usuario");
+        }
         return i;
     }
 
@@ -302,10 +325,16 @@ public class Menu {
         } while (true);
         if (opcion == 1) {
             admin.setNewNamedByIndex(input, i);
+            addAcctionToLog(null, admin, "Cambio el nombre del usuario "+admin.getUserByIndex(i).getName());
+            addAcctionToLog(admin.getUserByIndex(i), null, "Su nombre fue cambiado");
         } else if (opcion == 2) {
             admin.setNewUserNameByIndex(input, i);
+            addAcctionToLog(null, admin, "Cambio el nombre de usuario de "+admin.getUserByIndex(i).getName());
+            addAcctionToLog(admin.getUserByIndex(i), null, "Su nombre  de usuario fue cambiado");
         } else {
             admin.setNewPaswordByIndex(input, i);
+            addAcctionToLog(null, admin, "Cambio la contraseña del usuario "+admin.getUserByIndex(i).getName());
+            addAcctionToLog(admin.getUserByIndex(i), null, "Su contraseña fue cambiada");
         }
         return true;
     }
@@ -337,6 +366,7 @@ public class Menu {
         removeOneData(i);
         admin.deleteUser(i);
         System.out.println("Datos borrados con exito ");
+        addAcctionToLog(null, admin, "Borro un usuario");
         return true;
     }
 
@@ -346,6 +376,7 @@ public class Menu {
             return;
         }
         admin.addUser(createAccount(input));
+        addAcctionToLog(null, admin, "Creo un usuario");
     }
 
     public void allInformation(Adminfunctions admin, Scanner input) {
@@ -354,6 +385,7 @@ public class Menu {
             return;
         }
         admin.showAllInformation();
+        addAcctionToLog(null, admin, "Mostro la informacion de todos los usuarios");
     }
 
     public Integer loginOrCreate(Scanner input){
@@ -380,5 +412,13 @@ public class Menu {
                 System.out.println("Opcion no valida");
             }
         } while (true);
+    }
+
+    public void addAcctionToLog(User user, Adminfunctions admin, String acction){
+        if (admin!=null) {
+            admin.addActtionAdmin(acction, LocalDateTime.now());
+        } else {
+            user.addAcction(acction, LocalDateTime.now());
+        }
     }
 }

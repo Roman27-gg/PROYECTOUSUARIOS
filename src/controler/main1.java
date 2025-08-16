@@ -55,13 +55,7 @@ public class main1 {
                 }
             }
             x = true;
-            boolean isRepeat = false;
-            for (int i = 0; i < usersdata.length; i++) {
-                if (usersdata[i] == user) {
-                    isRepeat = true;
-                }
-            }
-            if (!isRepeat) {
+            if (menu.isRepeat(user.getId(), user.getUsername())) {
                 for (int i = 0; i < usersdata.length; i++) {
                     if (usersdata[i] == null) {
                         usersdata[i] = user;
@@ -79,7 +73,7 @@ public class main1 {
                 Integer opcion = menu.menu(input, user);
                 switch (opcion) {
                     case 1:
-                        if (menu.modifyPasword(input, user, null, admin)) {
+                        if (menu.modifyPasword(input, user, admin)) {
                             if (isAdmin) {
                                 admin.addActtionAdmin("Modifico su contraseña", LocalDateTime.now());
                             } else {
@@ -90,7 +84,7 @@ public class main1 {
                         input.nextLine();
                         break;
                     case 2:
-                        if (menu.modifyName(input, user, null, admin)) {
+                        if (menu.modifyName(input, user, admin)) {
                             if (isAdmin) {
                                 admin.addActtionAdmin("Modifico su nombre", LocalDateTime.now());
                             } else {
@@ -101,7 +95,7 @@ public class main1 {
                         input.nextLine();
                         break;
                     case 3:
-                        if (menu.modifyUserName(input, user, null, admin)) {
+                        if (menu.modifyUserName(input, user, admin)) {
                             if (isAdmin) {
                                 admin.addActtionAdmin("Modifico su nombre de usuario", LocalDateTime.now());
                             } else {
