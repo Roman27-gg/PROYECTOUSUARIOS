@@ -5,6 +5,11 @@ import java.util.Scanner;
 
 import service.Createuser;
 
+
+/**
+ * Representa un usuario dentro del sistema.
+ * Contiene información básica como nombre, usuario, contraseña e historial.
+ */
 public class User {
     private String name;
     private String id;
@@ -25,7 +30,7 @@ public class User {
         this.username = username;
         this.pasword = pasword;
         this.type = type;
-        stockhistory= new History[50]; 
+        stockhistory= new History[200]; 
     }
 
     public String getName() {
