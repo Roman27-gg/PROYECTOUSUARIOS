@@ -1,23 +1,59 @@
-@startuml user
-class User {
-    String name
-    String id
-    String username 
-    String pasword
-}
+@startuml logic
 
 enum Type {
-    STANDARD
-    ADMIN
+  ADMIN
+  STANDARD
 }
 
-User --> Type
+class User {
+  - String name
+  - String id
+  - String username
+  - String password
+  - Type type
+  - History[] stockhistory
+}
 
 class History {
-    String action 
-    LocalDateTime Date
+  - String action
+  - LocalDateTime date
 }
 
-User -- History
+class Adminfunctions {
+  - User user
+  - User[] users
+}
+
+class Createaccount {
+  - String[] ids
+  - String[] usernames
+}
+
+abstract class Createuser
+
+class Log {
+}
+
+class Menu {
+  - Createaccount account
+  - Modifyinformation modify
+  - Log log
+  - User[] users
+}
+
+class Modifyinformation {
+  - Log log
+}
+
+User *-- "0..*" History
+User --> Type
+Adminfunctions o-- "0..*" User
+Menu --> Createaccount
+Menu o-- "0..*" User
+Menu --> Log
+Menu --> Modifyinformation
+Modifyinformation --> Log
+Log --> User
+Log --> Adminfunctions
 
 @enduml
