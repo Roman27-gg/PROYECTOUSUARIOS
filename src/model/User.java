@@ -57,9 +57,8 @@ public class User {
         return type;
     }
 
-    public void setNewUserName(Scanner input){
-        System.out.println("Digite el nuevo nombre de usuario ");
-        username=(Createuser.validateUserName(input));
+    public void setNewUserName(String username){
+        this.username=username;
     }
 
     public void setNewPasword(Scanner input){

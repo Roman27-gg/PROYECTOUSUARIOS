@@ -1,184 +1,46 @@
 package service;
 
-import java.time.LocalDateTime;
 import java.util.Scanner;
 
 import model.Type;
 import model.User;
 
 public class Menu {
-    private String ids[];
-    private String usernames[];
+    private Createaccount account;
+    private Modifyinformation modify;
+    private Log log;
+    private User users[];
 
     public Menu() {
-        ids = new String[50];
-        usernames = new String[50];
+        users = new User[50];
+        log = new Log();
+        account = new Createaccount();
+        modify = new Modifyinformation(log);
     }
 
-    /**
-     * Elimina un registro de usuario en la posición indicada.
-     * 
-     * @param i índice del usuario a eliminar dentro de los arreglos.
-     */
-    public void removeOneData(Integer i) {
-        ids[i] = null;
-        usernames[i] = null;
-    }
-
-    /**
-     * Verifica si un par de ID y nombre de usuario ya existe en los arreglos.
-     *
-     * @param id identificador del usuario a verificar
-     * @param username nombre de usuario a verificar
-     * @return {@code true} si no se repite, {@code false} si ya existe
-     */
-    public Boolean isRepeat(String id, String username) {
-        for (int i = 0; i < ids.length; i++) {
-            if (ids[i] == null) {
-                continue;
+    public Integer addUser(User user) {
+        for (int i = 0; i < users.length; i++) {
+            if (users[i] == null) {
+                users[i] = user;
+                return i;
             }
-            if (ids[i].equalsIgnoreCase(id) && usernames[i].equalsIgnoreCase(username)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Agrega un nuevo registro de usuario (ID y nombre de usuario) en la primera posición disponible.
-     *
-     * @param id identificador del usuario
-     * @param username nombre de usuario
-     * @see #isRepeat(String, String)
-     */
-    public void addOneData(String id, String username) {
-        for (int i = 0; i < ids.length; i++) {
-            if (ids[i] == null && usernames[i] == null && isRepeat(id, username)) {
-                ids[i] = id;
-                usernames[i] = username;
-            }
-        }
-    }
-
-     /**
-     * Verifica si un nombre de usuario está disponible o ya está en uso.
-     *
-     * @param username nombre de usuario a verificar
-     * @return {@code true} si está disponible, {@code false} si ya existe
-     */
-    public Boolean checkUsername(String username) {
-        for (int i = 0; i < usernames.length; i++) {
-            if (usernames[i] == null) {
-                return true;
-            }
-            if (usernames[i].equals(username)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Verifica si un ID de usuario está disponible o ya está en uso.
-     *
-     * @param id identificador del usuario a verificar
-     * @return {@code true} si está disponible, {@code false} si ya existe
-     */
-    public Boolean checkId(String id) {
-        for (int i = 0; i < ids.length; i++) {
-            if (ids[i] == null) {
-                return true;
-            }
-            if (ids[i].equals(id)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Crea una nueva cuenta de usuario pidiendo la información por consola.
-     * Se valida nombre, nombre de usuario, contraseña e ID.
-     * Si se ingresa el código de seguridad correcto, el usuario se crea con rol de administrador.
-     *
-     * @param input objeto {@link Scanner} para leer la entrada del usuario
-     * @return un nuevo objeto {@link User} creado con la información ingresada
-     * @see Createuser
-     * @see User
-     */
-    public User createAccount(Scanner input) {
-        System.out.println("=====CREAR CUENTA=====");
-        String name = Createuser.validateName(input);
-        String username;
-        do {
-            username = Createuser.validateUserName(input);
-            if (checkUsername(username)) {
-                break;
-            } else {
-                System.out.println("Nombre de usuario ya existente");
-            }
-        } while (true);
-        String pasword = Createuser.validatePasword(input);
-        String id;
-        do {
-            id = Createuser.createId();
-            if (checkId(id)) {
-                break;
-            }
-        } while (true);
-        // Codigo inventado 45678
-        System.out.print("Para obtener el rol de administrador digite el codigo de seguridad: ");
-        String role = input.nextLine();
-        if (role.equals("45678")) {
-            System.out.println("Codigo aceptado");
-            addOneData(id, username);
-            return new User(name, id, username, pasword, Type.ADMIN);
-        }
-        System.out.println("Codigo rechazado");
-        addOneData(id, username);
-        return new User(name, username, pasword, id);
-    }
-
-     /**
-     * Permite a un usuario iniciar sesión con máximo 3 intentos.
-     *
-     * @param input objeto {@link Scanner} para leer la entrada
-     * @param users arreglo de usuarios registrados
-     * @return índice del usuario logueado o {@code null} si falla
-     */
-    public Integer login(Scanner input, User users[]) {
-        System.out.println("=====INICIO DE SESION=====");
-        for (int i = 3; i > 0; i--) {
-            System.out.println("Le quedan " + (i) + " intentos");
-            System.out.print("Digite su nombre de usuario: ");
-            String username = input.nextLine();
-            System.out.print("Digite su contraseña: ");
-            String pasword = input.nextLine();
-            for (int j = 0; j < users.length; j++) {
-                if (users[j] == null) {
-                    continue;
-                }
-                if (users[j].getUsername().equals(username) && users[j].getPasword().equals(pasword)) {
-                    System.out.println("Inicio de sesion exitoso");
-                    addOneData(users[j].getId(), users[j].getUsername());
-                    return j;
-                }
-            }
-            System.out.println("Contraseña o nombre de usuario incorrecto");
         }
         return null;
     }
 
+    public void deleteUser(Integer i) {
+        users[i] = null;
+    }
+
     /**
-     * Muestra el menú de opciones según el tipo de usuario (estándar o administrador).
+     * Muestra el menú de opciones según el tipo de usuario (estándar o
+     * administrador).
      *
      * @param input objeto {@link Scanner} para leer la entrada
-     * @param user usuario que está logueado
+     * @param user  usuario que está logueado
      * @return número de la opción seleccionada
      */
-    public Integer menu(Scanner input, User user) {
+    public Integer menuOption(Scanner input, User user) {
         System.out.println("=====MENU=====");
         if (user.getType() == Type.STANDARD) {
             do {
@@ -223,287 +85,200 @@ public class Menu {
                 }
             } while (true);
         }
-
     }
 
-    /**
-     * Verifica si la contraseña actual ingresada por el usuario coincide con la almacenada.
-     *
-     * @param input objeto {@link Scanner} para leer la entrada
-     * @param user usuario al que se le valida la contraseña
-     * @return {@code true} si la contraseña es correcta, {@code false} si falla
-     */
-    public Boolean actualPasword(Scanner input, User user) {
-        do {
-            for (int i = 3; i > 0; i--) {
-                System.out.println("Le quedan " + (i) + " intentos");
-                System.out.print("Digite la contraseña actual: ");
-                String pasword = input.nextLine();
-                if (user.getPasword().equals(pasword)) {
-                    return true;
-                }
-                System.out.println("Contraseña incorrecta ");
-            }
-            System.out.println("No se pudo completar la validacion de contraseña");
-            return false;
 
+      /**
+     * Muestra y gestiona el menú principal del sistema para un usuario autenticado.
+     * <p>
+     * Este método controla el flujo de interacción del usuario con el sistema,
+     * permitiéndole realizar distintas acciones según su rol ({@link Type#ADMIN} o usuario normal).
+     * En caso de que el usuario sea administrador, se inicializa una instancia
+     * de {@link Adminfunctions} para habilitar opciones avanzadas de gestión.
+     * </p>
+     *
+     * <p>
+     * Opciones principales del menú:
+     * <ul>
+     *     <li>1 - Modificar contraseña</li>
+     *     <li>2 - Modificar nombre</li>
+     *     <li>3 - Modificar nombre de usuario</li>
+     *     <li>4 - Ver información personal</li>
+     *     <li>5 - Ver historial personal</li>
+     *     <li>6 - Buscar usuario (admin)</li>
+     *     <li>7 - Modificar información de otros usuarios (admin)</li>
+     *     <li>8 - Eliminar usuario (admin)</li>
+     *     <li>9 - Crear usuario (admin)</li>
+     *     <li>10 - Ver información de todos los usuarios (admin)</li>
+     *     <li>11 - Ver historial completo (admin)</li>
+     *     <li>12 - Cerrar sesión</li>
+     * </ul>
+     * </p>
+     *
+     * <p>
+     * Cada acción ejecutada es registrada en el log mediante {@code log.addAcctionToLog}.
+     * El menú se repite indefinidamente hasta que el usuario decida salir del sistema.
+     * </p>
+     *
+     * @param input objeto {@link Scanner} para capturar las entradas del usuario en consola.
+     */
+    public void menu(Scanner input) {
+        Adminfunctions admin = null;
+        Integer l=null;
+        Boolean x= true;
+        do {
+            admin=null;
+            while (x) {
+                l = actualUser(input);
+                if (l == null) {
+                    continue;
+                }
+                x=false;
+            }
+            if (users[l].getType().equals(Type.ADMIN)) {
+                admin = new Adminfunctions(users[l]);
+                admin.deleteUsers();
+                admin.addArrayUsers(users);
+            }
+            Integer opcion = menuOption(input, users[l]);
+            switch (opcion) {
+                case 1:
+                    modify.modifyPasword(input, users[l], admin);
+                    System.out.print("Para volver a el menu presione enter ");
+                    input.nextLine();
+                    break;
+                case 2:
+                    modify.modifyName(input, users[l], admin);
+                    System.out.print("Para volver a el menu presione enter ");
+                    input.nextLine();
+                    break;
+                case 3:
+                    modify.modifyUserName(input, users[l], admin, account);
+                    account.changeUserNameData(l, users[l].getUsername());
+                    System.out.print("Para volver a el menu presione enter ");
+                    input.nextLine();
+                    break;
+                case 4:
+                    information(users[l], null, admin);
+                    System.out.print("Para volver a el menu presione enter ");
+                    input.nextLine();
+                    break;
+                case 5:
+                    log.showHistory(users[l], admin, input, false);
+                    System.out.print("Para volver a el menu presione enter ");
+                    input.nextLine();
+                    break;
+                case 6:
+                    modify.searchUser(admin, input);
+                    System.out.print("Para volver a el menu presione enter ");
+                    input.nextLine();
+                    break;
+                case 7:
+                    Integer j =modify.modifyInformations(admin, input, account);
+                    if (j != null) {
+                        account.changeUserNameData(j, users[j].getUsername());
+                    }
+                    System.out.print("Para volver a el menu presione enter ");
+                    input.nextLine();
+                    break;
+                case 8:
+                    deleteUser(admin, input);
+                    System.out.print("Para volver a el menu presione enter ");
+                    input.nextLine();
+                    break;
+                case 9:
+                    createUser(admin, input);
+                    System.out.print("Para volver a el menu presione enter ");
+                    input.nextLine();
+                    break;
+                case 10:
+                    allInformation(admin, input);
+                    System.out.print("Para volver a el menu presione enter ");
+                    input.nextLine();
+                    break;
+                case 11:
+                    log.showHistory(users[l], admin, input, true);
+                    System.out.print("Para volver a el menu presione enter ");
+                    input.nextLine();
+                    break;
+                case 12:
+                    x=true;
+                    System.out.println("Cerrando sesion.....");
+                    log.addAcctionToLog(users[l], admin, "Cerro sesion");
+                    break;
+                default:
+                    return;
+            }
         } while (true);
     }
 
     /**
-     * Permite cambiar la contraseña de un usuario estándar o de un administrador.
+     * Maneja el proceso de autenticación o creación de un nuevo usuario.
+     * <p>
+     * Dependiendo de la elección del usuario, este método permite:
+     * <ul>
+     *   <li>Iniciar sesión con un usuario existente.</li>
+     *   <li>Crear una nueva cuenta e iniciar sesión con ella.</li>
+     * </ul>
+     * Además, registra las acciones realizadas (inicio de sesión o creación de cuenta) en el log.
+     * Si el usuario que inicia sesión es de tipo {@link Type#ADMIN}, se inicializa
+     * una instancia de {@link Adminfunctions}.
+     * </p>
      *
-     * @param input objeto {@link Scanner}
-     * @param user usuario estándar
-     * @param admin Adminfunctions (puede ser {@code null})
-     * @see #actualPasword(Scanner, User)
+     * @param input objeto {@link Scanner} utilizado para capturar los datos ingresados por el usuario.
+     * @return el índice del usuario autenticado en el arreglo {@code users}, o {@code null}
+     *         si no se pudo iniciar sesión correctamente.
      */
-    public void modifyPasword(Scanner input, User user, Adminfunctions admin) {
-        if (actualPasword(input, user) == false) {
-            return;
+    public Integer actualUser(Scanner input) {
+        Adminfunctions admin = null;
+        if (loginOrCreate(input) == 1) {
+            Integer l = account.login(input, users);
+            if (l == null) {
+                System.out.println("No se pudo iniciar sesion");
+                return null;
+            } else {
+                if (users[l].getType().equals(Type.ADMIN)) {
+                    admin = new Adminfunctions(users[l]);
+                }
+                log.addAcctionToLog(users[l], admin, "Inicio sesion");
+                return l;
+            }
+        } else {
+            Integer l = addUser(account.createAccount(input));
+            if (users[l].getType().equals(Type.ADMIN)) {
+                admin = new Adminfunctions(users[l]);
+            }
+            log.addAcctionToLog(users[l], admin, "Creo su cuenta");
+            l = account.login(input, users);
+            if (l == null) {
+                System.out.println("No se ha podido iniciar sesion ");
+                return null;
+            } else {
+                log.addAcctionToLog(users[l], admin, "Inicio sesion");
+                return l;
+            }
         }
-        if (user.getType().equals(Type.STANDARD)) {
-            user.setNewPasword(input);
-            addAcctionToLog(user, null, "Cambio su contraseña");
-        } else if (admin != null) {
-            admin.setActualPasword(input);
-            addAcctionToLog(null, admin, "Cambio su contraseña");
-        }
-        System.out.println("Contraseña cambiada con exito");
-    }
-
-     /**
-     * Permite modificar el nombre de un usuario o administrador.
-     *
-     * @param input objeto {@link Scanner}
-     * @param user usuario 
-     * @param admin Adminfunctions (puede ser {@code null})
-     */
-    public void modifyName(Scanner input, User user, Adminfunctions admin) {
-        if (actualPasword(input, user) == false) {
-            return;
-        }
-        if (user.getType().equals(Type.STANDARD)) {
-            user.setNewName(input);
-            addAcctionToLog(user, null, "Cambio su nombre");
-        } else if (admin != null) {
-            admin.setActualName(input);
-            addAcctionToLog(null, admin, "Cambio su nombre");
-        }
-        System.out.println("Nombre cambiado con exito");
-    }
-
-    /**
-     * Permite modificar el nombre de usuario.
-     *
-     * @param input objeto {@link Scanner}
-     * @param user usuario estándar
-     * @param admin Adminfunctions (puede ser {@code null})
-     */
-    public void modifyUserName(Scanner input, User user, Adminfunctions admin) {
-        if (actualPasword(input, user) == false) {
-            return;
-        }
-        if (user.getType().equals(Type.STANDARD)) {
-            user.setNewUserName(input);
-            addAcctionToLog(user, null, "Cambio su nombre de usuario");
-        } else if (admin != null) {
-            admin.setActualUserName(input);
-            addAcctionToLog(null, admin, "Cambio su nombre de usuario");
-        }
-        System.out.println("Nombre de usuario cambiado con exito");
     }
 
     /**
      * Muestra información de un usuario (propia o de otros en caso de ser admin).
      *
-     * @param user usuario estándar
-     * @param i índice del usuario buscado (si aplica)
+     * @param user  usuario estándar
+     * @param i     índice del usuario buscado (si aplica)
      * @param admin Adminfunctions
      */
     public void information(User user, Integer i, Adminfunctions admin) {
         System.out.println();
         if (user.getType().equals(Type.STANDARD)) {
             System.out.println(user.toString());
-            addAcctionToLog(user, null, "Busco su informacion");
+            log.addAcctionToLog(user, null, "Busco su informacion");
         } else if (i != null) {
             admin.showInformation(i);
-            addAcctionToLog(null, admin, "Busco la informacion del usuario " + admin.getUserByIndex(i).getName());
+            log.addAcctionToLog(null, admin, "Busco la informacion del usuario " + admin.getUserByIndex(i).getName());
         } else if (admin != null) {
             admin.showActualInformation();
-            addAcctionToLog(null, admin, "Busco su informacion");
+            log.addAcctionToLog(null, admin, "Busco su informacion");
         }
-    }
-
-    /**
-     * Muestra el historial de acciones de un usuario o de todos en caso de administrador.
-     *
-     * @param user usuario estándar
-     * @param admin Adminfunctions
-     * @param input objeto {@link Scanner}
-     * @param byIndex indica si se busca un historial específico por índice
-     */
-    public void showHistory(User user, Adminfunctions admin, Scanner input, Boolean byIndex) {
-        if (admin == null) {
-            user.showHistory();
-            addAcctionToLog(user, null, "Mostro su log");
-        } else if (byIndex == false) {
-            admin.showActualHistory();
-            addAcctionToLog(null, admin, "Mostro su log");
-        } else {
-            System.out.println("Digite como desea buscar el usuario para mostrar su historial ");
-            String message;
-            Integer opcion = menuOpcion(input);
-            message = (opcion == 1) ? "Digite el nombre: "
-                    : (opcion == 2) ? "Digite el nombre de usuario: " : "Digite la id: ";
-            if (admin.showHistoryByIndex(input, message) == true) {
-                addAcctionToLog(null, admin, "Busco el log de un usuario");
-            }
-        }
-    }
-
-    /**
-     * Muestra un submenú para elegir cómo buscar a un usuario (por nombre, username o ID).
-     *
-     * @param input objeto {@link Scanner}
-     * @return número de opción seleccionada (1-3)
-     */
-    public Integer menuOpcion(Scanner input) {
-        do {
-            System.out.println("""
-                    1. Nombre
-                    2. Nombre de usuario
-                    3. Id""");
-            System.out.print("Digite su opcion: ");
-            String validate = input.nextLine();
-            if (validate.matches("[1-3]")) {
-                return Integer.parseInt(validate);
-            } else {
-                System.out.println("Opcion no valida (Numero del 1 a el 3)");
-            }
-        } while (true);
-    }
-
-    
-    /**
-     * Busca un usuario por nombre, nombre de usuario o ID.
-     *
-     * @param admin Adminfunctions
-     * @param input objeto {@link Scanner}
-     * @return índice del usuario encontrado o {@code null} si no existe
-     */
-    public Integer searchUser(Adminfunctions admin, Scanner input) {
-        if (admin == null) {
-            System.out.println("No eres admin ");
-            return null;
-        }
-        System.out.println("Digite como desea buscar el usuario ");
-        String message;
-        Integer opcion = menuOpcion(input);
-        message = (opcion == 1) ? "Digite el nombre: "
-                : (opcion == 2) ? "Digite el nombre de usuario: " : "Digite la id: ";
-        Integer i = admin.searchBy(input, message);
-        if (i != null) {
-            addAcctionToLog(null, admin, "Busco un usuario");
-        }
-        return i;
-    }
-
-    /**
-     * Permite a un administrador modificar la información de un usuario (nombre, usuario, contraseña, rol).
-     *
-     * @param admin Adminfunctions
-     * @param input objeto {@link Scanner}
-     * @see #setNewType(Scanner, Adminfunctions, Integer)
-     */
-    public void modifyInformations(Adminfunctions admin, Scanner input) {
-        if (admin == null) {
-            System.out.println("No eres admin ");
-            return;
-        }
-        if (actualPasword(input, admin.getUser()) == false) {
-            return;
-        }
-        Integer i = searchUser(admin, input);
-        if (i == null) {
-            return;
-        }
-        System.out.println("Digite que desea modificar del usuario: ");
-        Integer opcion;
-        do {
-            System.out.println("""
-                    1. Nombre
-                    2. Nombre de usuario
-                    3. Contraseña
-                    4. Rol""");
-            System.out.print("Digite su opcion: ");
-            String validate = input.nextLine();
-            if (validate.matches("[1-4]")) {
-                opcion = Integer.parseInt(validate);
-                break;
-            } else {
-                System.out.println("Opcion no valida (Numero del 1 a el 3)");
-            }
-        } while (true);
-        if (opcion == 1) {
-            admin.setNewNamedByIndex(input, i);
-            addAcctionToLog(null, admin, "Cambio el nombre del usuario " + admin.getUserByIndex(i).getName());
-            addAcctionToLog(admin.getUserByIndex(i), null, "Su nombre fue cambiado");
-        } else if (opcion == 2) {
-            admin.setNewUserNameByIndex(input, i);
-            addAcctionToLog(null, admin, "Cambio el nombre de usuario de " + admin.getUserByIndex(i).getName());
-            addAcctionToLog(admin.getUserByIndex(i), null, "Su nombre  de usuario fue cambiado");
-        } else if (opcion == 3) {
-            admin.setNewPaswordByIndex(input, i);
-            addAcctionToLog(null, admin, "Cambio la contraseña del usuario " + admin.getUserByIndex(i).getName());
-            addAcctionToLog(admin.getUserByIndex(i), null, "Su contraseña fue cambiada");
-        } else {
-            setNewType(input, admin, i);
-        }
-    }
-
-    /**
-     * Cambia el rol de un usuario (estándar ↔ administrador).
-     *
-     * @param input objeto {@link Scanner}
-     * @param admin Adminfunctions
-     * @param i índice del usuario a modificar
-     */
-    public void setNewType(Scanner input, Adminfunctions admin, Integer i) {
-        do {
-            System.out.println("¿Desea cambiar el rol a administrador o estandar? ");
-            System.out.println("""
-                    1. Admin
-                    2. Estandar
-                    """);
-            System.out.print("Digite su opcion: ");
-            String validate = input.nextLine();
-            if (validate.equals("1")) {
-                if (admin.getUserByIndex(i).getType().equals(Type.ADMIN)) {
-                    System.out.println("El usuario ya tiene actualmente el rol de admin");
-                    return;
-                } else {
-                    System.out.println("Usuario ascendido a admin ");
-                    admin.setTypeByIndex(i, "Admin");
-                    addAcctionToLog(null, admin, "Cambio el rol a admin del usuario " + admin.getUserByIndex(i).getName());
-                    addAcctionToLog(admin.getUserByIndex(i), null, "Su rol fue ascendido");
-                    return;
-                }
-            } else if (validate.equals("2")) {
-                if (admin.getUserByIndex(i).getType().equals(Type.STANDARD)) {
-                    System.out.println("El usuario ya tiene actualmente el rol de estandar");
-                    return;
-                } else {
-                    System.out.println("Usuario ahora tiene el rol de estandar ");
-                    admin.setTypeByIndex(i, "Estandar");
-                    addAcctionToLog(null, admin, "Cambio el rol a estandar del usuario " + admin.getUserByIndex(i).getName());
-                    addAcctionToLog(admin.getUserByIndex(i), null, "Su rol fue cambiado a estandar");
-                    return;
-                }
-            } else {
-                System.out.println("Opcion no valida");
-            }
-        } while (true);
     }
 
     /**
@@ -511,7 +286,8 @@ public class Menu {
      *
      * @param admin Adminfunctions
      * @param input objeto {@link Scanner}
-     * @return {@code true} si se eliminó correctamente, {@code false} en caso contrario
+     * @return {@code true} si se eliminó correctamente, {@code false} en caso
+     *         contrario
      * @see #removeOneData(Integer)
      */
     public Boolean deleteUser(Adminfunctions admin, Scanner input) {
@@ -519,10 +295,10 @@ public class Menu {
             System.out.println("No eres admin ");
             return false;
         }
-        if (actualPasword(input, admin.getUser())) {
+        if (modify.actualPasword(input, admin.getUser())==false) {
             return false;
         }
-        Integer i = searchUser(admin, input);
+        Integer i = modify.searchUser(admin, input);
         if (i == null) {
             return false;
         }
@@ -538,10 +314,11 @@ public class Menu {
                 System.out.println("Opcion no valida solo si o no");
             }
         } while (true);
-        removeOneData(i);
+        account.removeOneData(i);
         admin.deleteUser(i);
+        deleteUser(i);
         System.out.println("Datos borrados con exito ");
-        addAcctionToLog(null, admin, "Borro un usuario");
+        log.addAcctionToLog(null, admin, "Borro un usuario");
         return true;
     }
 
@@ -557,8 +334,10 @@ public class Menu {
             System.out.println("No eres admin ");
             return;
         }
-        admin.addUser(createAccount(input));
-        addAcctionToLog(null, admin, "Creo un usuario");
+        User user = account.createAccount(input);
+        log.addAcctionToLog(user, null, "Se creo su cuenta");
+        addUser(user);
+        log.addAcctionToLog(null, admin, "Creo un usuario");
     }
 
     /**
@@ -573,7 +352,7 @@ public class Menu {
             return;
         }
         admin.showAllInformation();
-        addAcctionToLog(null, admin, "Mostro la informacion de todos los usuarios");
+        log.addAcctionToLog(null, admin, "Mostro la informacion de todos los usuarios");
     }
 
     /**
@@ -593,8 +372,8 @@ public class Menu {
             String validate = input.nextLine();
             if (validate.matches("1|2")) {
                 if (validate.matches("1")) {
-                    for (int i = 0; i < ids.length; i++) {
-                        if (ids[i] != null) {
+                    for (int i = 0; i < 50; i++) {
+                        if (account.checkIsEmpity(i)) {
                             return Integer.parseInt(validate);
                         }
                     }
@@ -606,20 +385,5 @@ public class Menu {
                 System.out.println("Opcion no valida");
             }
         } while (true);
-    }
-
-     /**
-     * Agrega una acción al historial (log) de un usuario o administrador.
-     *
-     * @param user usuario estándar (puede ser {@code null})
-     * @param admin Adminfunctions (puede ser {@code null})
-     * @param acction descripción de la acción realizada
-     */
-    public void addAcctionToLog(User user, Adminfunctions admin, String acction) {
-        if (admin != null) {
-            admin.addActtionAdmin(acction, LocalDateTime.now());
-        } else {
-            user.addAcction(acction, LocalDateTime.now());
-        }
     }
 }

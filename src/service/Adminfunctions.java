@@ -26,6 +26,10 @@ public class Adminfunctions {
         return users[i];
     }
 
+    public void deleteUsers(){
+        users=null;
+    }
+
     /**
      * Muestra la información del usuario actual en consola.
      */
@@ -97,20 +101,20 @@ public class Adminfunctions {
      * Cambia el nombre de usuario de un usuario en una posición específica del
      * arreglo.
      *
-     * @param input objeto Scanner utilizado para leer el nuevo nombre de usuario.
+     * @param username nuevo nombre para un usuario en especifico
      * @param i     índice del usuario en el arreglo.
      */
-    public void setNewUserNameByIndex(Scanner input, int i) {
-        users[i].setNewUserName(input);
+    public void setNewUserNameByIndex(String username, int i) {
+        users[i].setNewUserName(username);
     }
 
     /**
      * Cambia el nombre de usuario del usuario actual.
      *
-     * @param input objeto Scanner utilizado para leer el nuevo nombre de usuario.
+     * @param username nuevo nombre para el usuario actual
      */
-    public void setActualUserName(Scanner input) {
-        user.setNewUserName(input);
+    public void setActualUserName(String username) {
+        user.setNewUserName(username);
     }
 
     /**
